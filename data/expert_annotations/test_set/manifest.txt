@@ -1,0 +1,107 @@
+EXPERT-ANNOTATED TEST SET — MANIFEST
+========================================================================
+
+Source: data/expert_annotations/normalised
+Assembly rule:
+  · Unique charters go to their sole annotator's file.
+  · Shared charters go to the adjudicated annotator's file.
+
+Per-annotator totals:
+  annotator_1_test.txt        unique= 35  adjudicated_shared= 1  total= 36
+  annotator_5_test.txt        unique= 10  adjudicated_shared= 6  total= 16
+  annotator_6_test.txt        unique= 10  adjudicated_shared= 3  total= 13
+  annotator_7_test.txt        unique= 10  adjudicated_shared= 0  total= 10
+  TOTAL                                                            total= 75
+
+Adjudication (10 shared charters):
+  SDHK 10643     → A6  (annotator_6_test.txt)
+  SDHK 10710     → A5  (annotator_5_test.txt)
+  SDHK 10789     → A5  (annotator_5_test.txt)
+  SDHK 11180     → A1  (annotator_1_test.txt)
+  SDHK 11459     → A5  (annotator_5_test.txt)
+  SDHK 11998     → A5  (annotator_5_test.txt)
+  SDHK 12106     → A5  (annotator_5_test.txt)
+  SDHK 12113     → A6  (annotator_6_test.txt)
+  SDHK 12157     → A6  (annotator_6_test.txt)
+  SDHK 41463     → A5  (annotator_5_test.txt)
+
+Full charter inventory (sorted by SDHK id):
+------------------------------------------------------------------------
+  SDHK 10635     A1  (annotator_1_test.txt)  [unique]
+  SDHK 10643     A6  (annotator_6_test.txt)  [ADJUDICATED]
+  SDHK 10649     A1  (annotator_1_test.txt)  [unique]
+  SDHK 10657     A6  (annotator_6_test.txt)  [unique]
+  SDHK 10658     A7  (annotator_7_test.txt)  [unique]
+  SDHK 10674     A1  (annotator_1_test.txt)  [unique]
+  SDHK 10694     A5  (annotator_5_test.txt)  [unique]
+  SDHK 10699     A1  (annotator_1_test.txt)  [unique]
+  SDHK 10710     A5  (annotator_5_test.txt)  [ADJUDICATED]
+  SDHK 10727     A7  (annotator_7_test.txt)  [unique]
+  SDHK 10742     A7  (annotator_7_test.txt)  [unique]
+  SDHK 10747     A1  (annotator_1_test.txt)  [unique]
+  SDHK 10781     A7  (annotator_7_test.txt)  [unique]
+  SDHK 10789     A5  (annotator_5_test.txt)  [ADJUDICATED]
+  SDHK 10791     A1  (annotator_1_test.txt)  [unique]
+  SDHK 10802     A1  (annotator_1_test.txt)  [unique]
+  SDHK 10825     A5  (annotator_5_test.txt)  [unique]
+  SDHK 10840     A1  (annotator_1_test.txt)  [unique]
+  SDHK 10850     A1  (annotator_1_test.txt)  [unique]
+  SDHK 10875     A6  (annotator_6_test.txt)  [unique]
+  SDHK 10885     A1  (annotator_1_test.txt)  [unique]
+  SDHK 10897     A7  (annotator_7_test.txt)  [unique]
+  SDHK 10912     A1  (annotator_1_test.txt)  [unique]
+  SDHK 10919     A1  (annotator_1_test.txt)  [unique]
+  SDHK 10922     A1  (annotator_1_test.txt)  [unique]
+  SDHK 10930     A7  (annotator_7_test.txt)  [unique]
+  SDHK 10952     A7  (annotator_7_test.txt)  [unique]
+  SDHK 10955     A5  (annotator_5_test.txt)  [unique]
+  SDHK 10956     A6  (annotator_6_test.txt)  [unique]
+  SDHK 11000     A6  (annotator_6_test.txt)  [unique]
+  SDHK 11032     A1  (annotator_1_test.txt)  [unique]
+  SDHK 11176     A6  (annotator_6_test.txt)  [unique]
+  SDHK 11177     A1  (annotator_1_test.txt)  [unique]
+  SDHK 11180     A1  (annotator_1_test.txt)  [ADJUDICATED]
+  SDHK 11202     A1  (annotator_1_test.txt)  [unique]
+  SDHK 11229     A1  (annotator_1_test.txt)  [unique]
+  SDHK 11243     A5  (annotator_5_test.txt)  [unique]
+  SDHK 11335     A1  (annotator_1_test.txt)  [unique]
+  SDHK 11421     A1  (annotator_1_test.txt)  [unique]
+  SDHK 11426     A7  (annotator_7_test.txt)  [unique]
+  SDHK 11459     A5  (annotator_5_test.txt)  [ADJUDICATED]
+  SDHK 11472     A1  (annotator_1_test.txt)  [unique]
+  SDHK 11474     A6  (annotator_6_test.txt)  [unique]
+  SDHK 11492     A1  (annotator_1_test.txt)  [unique]
+  SDHK 11499     A7  (annotator_7_test.txt)  [unique]
+  SDHK 11502     A7  (annotator_7_test.txt)  [unique]
+  SDHK 11523     A5  (annotator_5_test.txt)  [unique]
+  SDHK 11554     A6  (annotator_6_test.txt)  [unique]
+  SDHK 11991     A1  (annotator_1_test.txt)  [unique]
+  SDHK 11998     A5  (annotator_5_test.txt)  [ADJUDICATED]
+  SDHK 12005     A1  (annotator_1_test.txt)  [unique]
+  SDHK 12006     A1  (annotator_1_test.txt)  [unique]
+  SDHK 12008     A6  (annotator_6_test.txt)  [unique]
+  SDHK 12039     A5  (annotator_5_test.txt)  [unique]
+  SDHK 12085     A6  (annotator_6_test.txt)  [unique]
+  SDHK 12086     A5  (annotator_5_test.txt)  [unique]
+  SDHK 12088     A1  (annotator_1_test.txt)  [unique]
+  SDHK 12105     A1  (annotator_1_test.txt)  [unique]
+  SDHK 12106     A5  (annotator_5_test.txt)  [ADJUDICATED]
+  SDHK 12113     A6  (annotator_6_test.txt)  [ADJUDICATED]
+  SDHK 12129     A1  (annotator_1_test.txt)  [unique]
+  SDHK 12147     A1  (annotator_1_test.txt)  [unique]
+  SDHK 12156     A1  (annotator_1_test.txt)  [unique]
+  SDHK 12157     A6  (annotator_6_test.txt)  [ADJUDICATED]
+  SDHK 12163     A1  (annotator_1_test.txt)  [unique]
+  SDHK 12239     A1  (annotator_1_test.txt)  [unique]
+  SDHK 12240     A5  (annotator_5_test.txt)  [unique]
+  SDHK 12248     A1  (annotator_1_test.txt)  [unique]
+  SDHK 12270     A5  (annotator_5_test.txt)  [unique]
+  SDHK 12280     A1  (annotator_1_test.txt)  [unique]
+  SDHK 12287     A1  (annotator_1_test.txt)  [unique]
+  SDHK 12299     A1  (annotator_1_test.txt)  [unique]
+  SDHK 12300     A6  (annotator_6_test.txt)  [unique]
+  SDHK 39746     A5  (annotator_5_test.txt)  [unique]
+  SDHK 41463     A5  (annotator_5_test.txt)  [ADJUDICATED]
+
+========================================================================
+Total charters in test set: 75

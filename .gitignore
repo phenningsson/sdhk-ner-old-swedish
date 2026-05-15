@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Environment
+.env
+
+# Editor
+.DS_Store
+.vscode/
+.idea/
+
+# Models (too big for git)
+models/
+
+# Large data (decide per file — see step 4)
+# data/raw/
