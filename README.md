@@ -7,9 +7,9 @@
 
 This repository contains the code and data developed for an MA thesis at Linnaeus University on Named Entity Recognition (NER) for Old Swedish charter texts. We view NER as a token classification task in which the model identifies either [Person] or [Location] entities in Old Swedish editions of medieval charters from the *Svenskt Diplomatariums Huvudkartotek* (SDHK), the main catalogue of the Swedish Diplomatarium maintained by Riksarkivet.
 
-Because no large hand-annotated NER dataset exists for Old Swedish, training data is bootstrapped from SDHK itself using a **three-signal entity projection pipeline** that uses the structure of each SDHK record: every charter has both a modern Swedish summary (regest) and an Old Swedish digital edition (transcription). The pipeline runs a Swedish NER model on the modern summary, projects the resulting annotation labels back onto the Old Swedish edition by fuzzy matching, and combines that signal with gazetteer lookup (TORA, Diplomatarium Fennicum, Sveriges medeltida personnamn) and a capitalisation heuristic. The three signals vote on a final BIO-label per token, producing a silver-standard CoNLL corpus from which the NER model is then trained. A held-out gold set of 75 charters, annotated by domain experts, is used to evaluate both the projection pipeline itself and the trained NER model. For more information about the pipeline, the training and evaluation data, the annotation process, and the model variants, see *(coming soon)*. The fine-tuned NER model and the MLM-adapted base it builds on are available on [HuggingFace](https://huggingface.co/phenningsson).
+Because no large hand-annotated NER dataset exists for Old Swedish, training data is bootstrapped from SDHK itself using a **three-signal entity projection pipeline** that uses the structure of each SDHK record: every charter has both a modern Swedish summary (regest) and an Old Swedish digital edition (transcription). The pipeline runs a Swedish NER model on the modern summary, projects the resulting annotation labels back onto the Old Swedish edition by fuzzy matching, and combines that signal with gazetteer lookup (TORA, Diplomatarium Fennicum, Sveriges medeltida personnamn) and a capitalisation heuristic. The three signals vote on a final BIO-label per token, producing a silver-standard CoNLL corpus. This corpus was then manually verified, and the results of the manual verification thus constitute the data from which the NER model is then trained. A held-out gold set of 75 charters, annotated by domain experts, is used to evaluate both the projection pipeline itself and the trained NER model. For more information about the pipeline, the training and evaluation data, the annotation process, and the model variants, see the paper *(coming soon)*. The fine-tuned NER model and the MLM-adapted base it builds on are available on [HuggingFace](https://huggingface.co/phenningsson).
 
-For our best performing NER model on Old Swedish charter editions, we achieve an e entity-level **micro-F1 score of 0.9771** on the internal test set (43 silver charters held out by the 80/10/10 split) and **F1 = 0.9764** on the external expert-gold test set (75 charters annotated independently of the silver pipeline). The best model is an XLM-RoBERTa-large checkpoint, first domain-adapted to Old Swedish through continued Masked Language Modelling (MLM) on the full SDHK Old Swedish corpus, then fine-tuned for token classification on a manually verified training dataset of Old Swedish charters from 1380-1382.
+For our best performing NER model on Old Swedish charter editions, we achieve an e entity-level **micro-F1 score of 0.9771** on the internal test set (43) of charters held out by the 80/10/10 split) and **F1 = 0.9764** on the external expert-gold test set (75 charters annotated independently by domain experts). The best model is an XLM-RoBERTa-large checkpoint, first domain-adapted to Old Swedish through continued Masked Language Modelling (MLM) on the full SDHK Old Swedish corpus, then fine-tuned for token classification on a manually verified training dataset of Old Swedish charters from 1380-1382.
 
 Inter-annotator agreement on the 10 shared adjudication charters is Krippendorff's α = **0.9812** (token-level, IO labels) and mean pairwise entity-level F1 = **0.9672** (exact span + type) across the four annotation groups.
 
@@ -24,7 +24,7 @@ sdhk-ner-old-swedish/
 │   ├── raw/                        # Scraped SDHK charter JSONs
 │   ├── 1380_1382_dataset/          # 417 CoNLL files of Old Swedish charters (1380-1382)
 │   ├── internal_test_set/          # 43 held-out CoNLL files (80/10/10 split)
-│   ├── external_test_set/          # 23 external CoNLL files, not used in the thesis for evaluation, but used for use case examples
+│   ├── external_test_set/          # 23 external CoNLL files, not used in the paper for evaluation, but used for use case examples of the model
 │   ├── expert_gold_test/           # 75 CoNLL files from the expert annotations
 │   └── expert_annotations/
 │       ├── pre_adjudication/       # 4 annotator files before adjudication (adjudication by the author)
@@ -76,7 +76,7 @@ CPU-only; pulls the fine-tuned model from HuggingFace on first run:
 python scripts/evaluate_ner_v2.py
 ```
 
-#### 2. Reproduce the projection pipeline's silver CoNLL output
+#### 2. Reproduce the projection pipeline's  CoNLL output
 
 ```bash
 python scripts/run_projection.py
@@ -142,7 +142,7 @@ Vpsala   B-Location
 
 ## Pipeline Overview
 
-The three-signal entity projection pipeline produces silver-standard BIO
+The three-signal entity projection pipeline produces -standard BIO
 labels for each Old Swedish charter edition:
 
 - **Signal 1 — NER projection on the modern summary.** A modern Swedish NER
