@@ -1,0 +1,195 @@
+Old Swedish NER - License Information
+
+This repository contains both source code and datasets for Named Entity Recognition on Old Swedish charter texts. Different components are licensed
+under different terms.
+
+================================================================================
+CODE LICENSE - GNU General Public License v3.0 (GPL-3.0)
+================================================================================
+
+All source code in this repository (files in scripts/, src/, and any other
+Python files) is licensed under the GNU General Public License v3.0.
+
+Copyright (C) 2025 Pontus Henningsson
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+Full GNU GPL-3.0 license text: https://www.gnu.org/licenses/gpl-3.0.html
+
+================================================================================
+DATA LICENSE - Creative Commons Attribution 4.0 (CC BY 4.0)
+================================================================================
+
+The datasets included in this repository (all files in the data/ directory)
+are licensed under the Creative Commons Attribution 4.0
+International License (CC BY 4.0).
+
+To view a copy of this license, visit:
+https://creativecommons.org/licenses/by/4.0/
+
+You are free to:
+- Share — copy and redistribute the material in any medium or format
+- Adapt — remix, transform, and build upon the material for any purpose, even commercially
+
+Under the following terms:
+- Attribution — You must give appropriate credit, provide a link to the
+  license, and indicate if changes were made
+
+Full license text: https://creativecommons.org/licenses/by/4.0/
+
+================================================================================
+GPL-3.0 & CC BY 4.0
+================================================================================
+
+- CODE (GPL-3.0): Ensures that any modifications to the software remain open source and benefit the community.
+
+- DATA (CC BY 4.0): Allows broad reuse while requiring attribution.
+
+================================================================================
+DATA SOURCES AND ATTRIBUTIONS
+================================================================================
+
+This repository includes data derived from the following sources. Users who
+redistribute or build on the derived datasets should additionally respect the
+licensing terms of each upstream source.
+
+1. SDHK — Svenskt Diplomatariums Huvudkartotek
+   The Main Catalogue of the Swedish Diplomatarium, distributed by the
+   Swedish National Archives (Riksarkivet). Scraped charter JSONs in data/raw/ and all derived CoNLL datasets ultimately originate from SDHK
+   Edition (Old Swedish charter text) and Summary (modern Swedish regest)
+   fields.
+   Source: https://sok.riksarkivet.se/sdhk
+   CSV export: https://filer.riksarkivet.se/registerdata/SDHK/csv/sdhk_2411.csv
+   License: see the SDHK terms of use at Riksarkivet, CC-BY 4.0 License, https://sok.riksarkivet.se/data-api/nedladdningsbara-datamangder/sdhk-de-svenska-medeltidsbreven.
+
+   Citation:
+   @misc{sdhk,
+     author = {Riksarkivet},
+     title  = {Svenskt Diplomatariums Huvudkartotek (SDHK)},
+     url    = {https://sok.riksarkivet.se/sdhk}
+   }
+
+2. TORA — Topografiskt Register
+   Historical settlement gazetteer maintained by Riksarkivet; used as
+   Signal 2 (gazetteer lookup) for Location entities.
+   Source: https://riksarkivet.se/tora
+   License: see TORA terms of use at Riksarkivet, CC-BY 4.0 License.
+
+   Citation:
+   @misc{tora,
+     author = {Riksarkivet},
+     title  = {TORA — Topografiskt Register},
+     url    = {https://riksarkivet.se/tora}
+   }
+
+3. DF — Diplomatarium Fennicum
+   Finnish medieval charter database, maintained by Kansallisarkisto
+   (National Archives of Finland); used to augment TORA with place-name
+   coverage for the eastern part of the medieval Swedish realm.
+   Source: http://df.narc.fi
+   License: see Diplomatarium Fennicum terms of use, CC0 1.0 Universal License.
+
+   Citation:
+   @misc{df,
+     author = {Kansallisarkisto},
+     title  = {Diplomatarium Fennicum},
+     url    = {http://df.narc.fi}
+   }
+
+4. SMP — Sveriges medeltida personnamn
+   Dictionary of Swedish medieval personal names, edited by Institutet för
+   språk och folkminnen (Isof); used as Signal 2 (gazetteer lookup) for
+   Person entities.
+   Source: https://smp.isof.se/
+   License: see SMP terms of use at Isof, CC-BY 4.0 License.
+
+   Citation:
+   @misc{smp,
+     author = {Institutet för språk och folkminnen},
+     title  = {Sveriges medeltida personnamn (SMP)},
+     url    = {https://smp.isof.se/}
+   }
+
+5. KB-BERT (Swedish BERT models from KBLab)
+   KBLab/bert-base-swedish-cased and KBLab/bert-base-swedish-cased-ner are
+   used as the Signal 1 NER backbone (on modern Swedish summaries) and as
+   baseline fine-tuning targets in the NER training experiments.
+   Source: https://huggingface.co/KBLab/bert-base-swedish-cased
+   License: see the model card on HuggingFace, CC0 1.0 Universal License.
+
+   Citation:
+   @misc{malmsten2020playing,
+     title={Playing with Words at the National Library of Sweden -- Making a Swedish BERT},
+     author={Martin Malmsten and Love Börjeson and Chris Haffenden},
+     year={2020},
+     eprint={2007.01658},
+     archivePrefix={arXiv},
+     primaryClass={cs.CL}
+    }
+
+
+6. XLM-RoBERTa
+   xlm-roberta-large is used as the base model for MLM domain adaptation
+   on Old Swedish; the resulting checkpoint is then fine-tuned for NER.
+   Source: https://huggingface.co/FacebookAI/xlm-roberta-large
+   License: MIT
+
+   Citation:
+   @inproceedings{conneau-etal-2020-unsupervised,
+     title     = "Unsupervised Cross-lingual Representation Learning at Scale",
+     author    = "Conneau, Alexis and Khandelwal, Kartikay and
+                  Goyal, Naman and Chaudhary, Vishrav and Wenzek, Guillaume
+                  and Guzm\'an, Francisco and Grave, Edouard and Ott, Myle
+                  and Zettlemoyer, Luke and Stoyanov, Veselin",
+     booktitle = "Proceedings of the 58th Annual Meeting of the Association
+                  for Computational Linguistics",
+     year      = "2020",
+     url       = "https://aclanthology.org/2020.acl-main.747"
+   }
+
+================================================================================
+EXPERT ANNOTATIONS
+================================================================================
+
+The expert annotations in data/expert_annotations/ and the derived gold test set in data/expert_gold_test/ were produced by four expert annotators. We sincerely thank the annotators for their careful work.
+
+================================================================================
+CITATION
+================================================================================
+
+If you want to reference this work in any way, please cite:
+
+@key{comingsoon,
+}
+
+Additionally, please cite the individual data sources listed above that you
+use.
+
+================================================================================
+DISCLAIMER
+================================================================================
+
+This repository is provided for academic research purposes. The author makes
+no warranties regarding the accuracy or completeness of the data or code.
+
+THE CODE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+THE DATA IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
+
+================================================================================
+CONTACT
+================================================================================
+
+For questions or issues, please:
+Open a GitHub issue, or email [phenningsson@me.com].

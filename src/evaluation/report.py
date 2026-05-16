@@ -3,8 +3,7 @@ Shared reporting logic for NER evaluation: entity-level (seqeval) +
 token-level (sklearn, O excluded from aggregates) + FP/FN error
 diagnostic + JSON dump. Imported by both scripts/evaluate_ner_v2.py
 (model evaluation) and scripts/evaluate_pipeline.py (projection-pipeline
-evaluation) so the two cannot drift apart — the thesis compares their
-numbers directly.
+evaluation) so the two cannot drift apart.
 
 Single entry point:
     compute_and_report(true_labels, true_predictions, tokens_per_seq,
@@ -221,8 +220,8 @@ def compute_and_report(
     extra_fields=None,
 ):
     """
-    Run the full thesis-reporting pipeline on already-aligned
-    gold/prediction sequences:
+    Run the full reporting pipeline on already-aligned gold/prediction
+    sequences:
 
       · entity-level (strict) metrics via seqeval
       · per-class TP/FP/FN reconstruction via get_entities
@@ -314,7 +313,7 @@ def compute_and_report(
 
     # --- print ---
     print("=" * 72)
-    print(f"  Results (full precision — thesis-reporting format, source={source})")
+    print(f"  Results (full precision, source={source})")
     print("=" * 72)
     print()
     print("  Aggregate metrics:")

@@ -313,11 +313,15 @@ TRAIN_SEED = 42
 
 LABEL_LIST = ["O", "B-Person", "I-Person", "B-Location", "I-Location"]
 
-# Model variants for NER experiments
+# Model variants for NER experiments.
+# "mlm-adapted" points at the published MLM-adapted model on HuggingFace
+# Hub. To fine-tune on a locally produced checkpoint instead, replace this
+# string with the local output directory of scripts/pretrain_mlm.py (by
+# default os.path.join(PROJECT_ROOT, "models", "mlm_pretrained_v3")).
 NER_MODEL_VARIANTS = {
     "ner-swe": "KBLab/bert-base-swedish-cased-ner",
     "bert-swe": "KBLab/bert-base-swedish-cased",
-    "mlm-adapted": os.path.join(PROJECT_ROOT, "models", "mlm_pretrained_v3"),
+    "mlm-adapted": "phenningsson/sdhk-mlm-pretrained",
     "xlm-roberta": "xlm-roberta-base",
     "xlm-roberta-large": "xlm-roberta-large",
 }

@@ -1,0 +1,221 @@
+# Old Swedish Named Entity Recognition
+
+[![Code License: GPL v3](https://img.shields.io/badge/Code%20License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Data License: CC BY 4.0](https://img.shields.io/badge/Data%20License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-FFD21E?logo=huggingface&logoColor=000)](https://huggingface.co/phenningsson)
+
+This repository contains the code and data developed for an MA thesis at Linnaeus University on Named Entity Recognition (NER) for Old Swedish charter texts. We view NER as a token classification task in which the model identifies either [Person] or [Location] entities in Old Swedish editions of medieval charters from the *Svenskt Diplomatariums Huvudkartotek* (SDHK), the main catalogue of the Swedish Diplomatarium maintained by Riksarkivet.
+
+Because no large hand-annotated NER dataset exists for Old Swedish, training data is bootstrapped from SDHK itself using a **three-signal entity projection pipeline** that uses the structure of each SDHK record: every charter has both a modern Swedish summary (regest) and an Old Swedish digital edition (transcription). The pipeline runs a Swedish NER model on the modern summary, projects the resulting annotation labels back onto the Old Swedish edition by fuzzy matching, and combines that signal with gazetteer lookup (TORA, Diplomatarium Fennicum, Sveriges medeltida personnamn) and a capitalisation heuristic. The three signals vote on a final BIO-label per token, producing a silver-standard CoNLL corpus from which the NER model is then trained. A held-out gold set of 75 charters, annotated by domain experts, is used to evaluate both the projection pipeline itself and the trained NER model. For more information about the pipeline, the training and evaluation data, the annotation process, and the model variants, see *(coming soon)*. The fine-tuned NER model and the MLM-adapted base it builds on are available on [HuggingFace](https://huggingface.co/phenningsson).
+
+For our best performing NER model on Old Swedish charter editions, we achieve an e entity-level **micro-F1 score of 0.9771** on the internal test set (43 silver charters held out by the 80/10/10 split) and **F1 = 0.9764** on the external expert-gold test set (75 charters annotated independently of the silver pipeline). The best model is an XLM-RoBERTa-large checkpoint, first domain-adapted to Old Swedish through continued Masked Language Modelling (MLM) on the full SDHK Old Swedish corpus, then fine-tuned for token classification on a manually verified training dataset of Old Swedish charters from 1380-1382.
+
+Inter-annotator agreement on the 10 shared adjudication charters is Krippendorff's α = **0.9812** (token-level, IO labels) and mean pairwise entity-level F1 = **0.9672** (exact span + type) across the four annotation groups.
+
+## Repository Structure
+
+```
+sdhk-ner-old-swedish/
+├── config.py                       # Paths, thresholds, model variants
+├── requirements.txt
+├── data/
+│   ├── gazetteers/                 # TORA, DF, SMP lookup tables (Signal 2)
+│   ├── raw/                        # Scraped SDHK charter JSONs
+│   ├── 1380_1382_dataset/          # 417 CoNLL files of Old Swedish charters (1380-1382)
+│   ├── internal_test_set/          # 43 held-out CoNLL files (80/10/10 split)
+│   ├── external_test_set/          # 23 external CoNLL files, not used in the thesis for evaluation, but used for use case examples
+│   ├── expert_gold_test/           # 75 CoNLL files from the expert annotations
+│   └── expert_annotations/
+│       ├── pre_adjudication/       # 4 annotator files before adjudication (adjudication by the author)
+│       └── test_set/               # 4 annotator files after adjudication (creates the expert_gold_test set)
+├── src/
+│   ├── pipeline.py                 # Three-signal entity projection pipeline orchestration
+│   ├── scraping/scrape_sdhk.py     # SDHK scraper
+│   ├── preprocessing/              # Text cleaning, tokenisation, gazetteer prep
+│   ├── projection/                 # Signals 1–3 + voting
+│   ├── training/                   # CoNLL utilities, splitting
+│   └── evaluation/                 # Shared metrics + JSON dump of evaluation
+└── scripts/
+    ├── run_projection.py           # Run the 3-signal pipeline
+    ├── evaluate_pipeline.py        # Evaluate pipeline against domain expert's annotation (expert_gold_test set)
+    ├── pretrain_mlm.py             # MLM domain adaptation of the base language model
+    ├── train_ner_v2.py             # NER fine-tuning (O-boundary chunking)
+    ├── evaluate_ner_v2.py          # NER evaluation
+    ├── extract_mlm_corpus.py       # Extract editions from SDHK CSV for MLM pre-training
+    ├── extract_internal_test_set.py# Reproduce the 43-file held-out split from the 1380_1382_dataset
+    ├── build_test_set.py           # Adjudicate annotator files → test_set/
+    ├── convert_test_set_to_conll.py# Annotator .txt → gold CoNLL
+    ├── compute_iaa.py              # Krippendorff α + pairwise F1, not used to report final IAA results
+    └── compute_iaa_v2.py           # Same metrics via NLTK AnnotationTask, used to report final IAA results
+```
+
+## Get Started
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/phenningsson/sdhk-ner-old-swedish
+cd sdhk-ner-old-swedish
+```
+
+2. Install dependencies (a Python 3.10+ virtual environment is recommended):
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Quickstart
+
+#### 1. Evaluate the published NER model on the expert  test set
+
+CPU-only; pulls the fine-tuned model from HuggingFace on first run:
+```bash
+python scripts/evaluate_ner_v2.py
+```
+
+#### 2. Reproduce the projection pipeline's silver CoNLL output
+
+```bash
+python scripts/run_projection.py
+```
+
+#### 3. Reproduce the internal 80/10/10 split
+
+```bash
+python scripts/extract_internal_test_set.py
+```
+
+#### 4. Reproduce the expert CoNLL test set
+
+```bash
+python scripts/convert_test_set_to_conll.py
+```
+
+#### 5. Compute inter-annotator agreement
+
+```bash
+python scripts/compute_iaa_v2.py
+```
+
+#### 6. Fine-tune NER from a chosen base model (requires GPU)
+
+```bash
+python scripts/train_ner_v2.py --model mlm-adapted
+```
+
+Available `--model` variants: `ner-swe`, `bert-swe`, `mlm-adapted`,
+`xlm-roberta`, `xlm-roberta-large`.
+
+#### 7. MLM domain-adapt a base model on the full SDHK Old Swedish corpus (requires GPU)
+
+```bash
+python scripts/extract_mlm_corpus.py --csv sdhk_2411.csv  # download CSV first
+python scripts/pretrain_mlm.py --base-model xlm-roberta-large
+```
+
+## Entity Types
+
+- **Person** — person names
+- **Location** — place names
+
+BIO tagging is used: `B-Person`, `I-Person`, `B-Location`, `I-Location`, `O`.
+
+## Data Format
+
+All CoNLL files use the same space-separated, one-token-per-line format, with
+a blank line after every sentence-ending punctuation mark:
+
+```
+Token    Label
+Magnus   B-Person
+Eriksson I-Person
+gaff     O
+Stokholm B-Location
+ok       O
+Vpsala   B-Location
+.        O
+         (blank line separates sentences)
+```
+
+## Pipeline Overview
+
+The three-signal entity projection pipeline produces silver-standard BIO
+labels for each Old Swedish charter edition:
+
+- **Signal 1 — NER projection on the modern summary.** A modern Swedish NER
+  model (KB-BERT) is run on the modern regest of each charter. Entities
+  found are projected onto the Old Swedish edition by progressive
+  Levenshtein matching and a consonant-skeleton fallback since the Old
+  Swedish orthography of a name can differ substantially from its modern
+  form.
+
+- **Signal 2 — Gazetteer lookup.** Each Old Swedish token is matched
+  against TORA + Diplomatarium Fennicum (places) and SMP (persons), using
+  exact match plus fuzzy match with a length-ratio guard. Latin and Old
+  Swedish stoplists filter out common formulaic vocabulary that overlaps
+  with gazetteer entries.
+
+- **Signal 3 — Capitalisation + context heuristic.** Tokens capitalised in
+  the edition are inspected together with their left- and right-context
+  (locative prepositions, person titles, administrative suffixes, etc) to
+  propose Person/Location labels for entities that the first two signals missed.
+
+- **Voting.** A vote function combines the three signals into the final BIO
+  label per token, with post-processing for patronymic continuations and
+  title/preposition stripping.
+
+The pipeline output for the 75-charter expert gold test set reaches an
+entity-level micro F1 of approximately 0.70 — sufficient to bootstrap
+training data, but well below what the fine-tuned NER model achieves on
+the same gold set.
+
+## Reproducing Results
+
+The repository is designed so that a fresh clone (with dependencies
+installed) can reproduce every committed data artifact and every reported
+metric using the included scripts. The NER weights are not bundled — the
+fine-tuned model is hosted on HuggingFace and is downloaded on first run
+of `evaluate_ner_v2.py`. Some scripts need GPUs and external CSV files
+(noted in their docstrings); these are clearly marked.
+
+## Resources
+
+- **Paper:** *(coming soon)*
+- **Models:** [HuggingFace Hub — phenningsson](https://huggingface.co/phenningsson)
+  - Fine-tuned NER: `phenningsson/sdhk-ner-old-swedish-v2`
+  - MLM-adapted base: `phenningsson/sdhk-mlm-pretrained`
+- **Data sources:** SDHK, TORA, Diplomatarium Fennicum, Sveriges medeltida
+  personnamn — see [LICENSE.txt](LICENSE.txt) for full attributions.
+
+## Citation
+
+If you want to reference this work in any way, please cite:
+
+```bibtex
+@key{comingsoon}
+```
+
+## License
+
+For complete licensing details, attributions, and citations, please see the [LICENSE.txt](LICENSE.txt) file. In short, we use the **GNU General Public License v3.0 (GPL-3.0)** for all the source code (Python scripts), and the **Creative Commons Attribution 4.0 (CC BY 4.0)** for the derived data.
+
+**Note:** Charter texts and gazetteers are derived from external sources (SDHK, TORA, Diplomatarium Fennicum, SMP). Please also respect the licensing terms of those upstream sources when reusing data from this repository.
+
+## Acknowledgments
+
+We are grateful for the great resources below, and for making it possible for us to use their data in order to conduct our academic research and develop NER models for Old Swedish. We thank developers, annotators, scholars, project managers, and anyone else who has contributed to these projects. We are indebted to the open source community, and hope to contribute to it ourselves with our work. We also express our sincerest gratitude to the four expert annotators who carefully marked Person and Location entities in the 75 charters that form the expert gold test set.
+
+- **SDHK — Svenskt Diplomatariums Huvudkartotek:** [Riksarkivet](https://sok.riksarkivet.se/sdhk)
+- **TORA — Topografiskt Register:** [Riksarkivet](https://riksarkivet.se/tora)
+- **Diplomatarium Fennicum:** [Kansallisarkisto](http://df.narc.fi)
+- **Sveriges medeltida personnamn (SMP):** [Institutet för språk och folkminnen](https://smp.isof.se/)
+- **KB-BERT Swedish models:** [KBLab](https://huggingface.co/KBLab)
+- **XLM-RoBERTa-large:** [Conneau et al. 2020](https://aclanthology.org/2020.acl-main.747)
+
+## Contact
+
+For questions or issues, please open a GitHub issue or contact:
+[phenningsson@me.com]

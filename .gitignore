@@ -12,6 +12,7 @@ venv/
 .DS_Store
 .vscode/
 .idea/
+.claude
 
 # Models (too big for git)
 models/

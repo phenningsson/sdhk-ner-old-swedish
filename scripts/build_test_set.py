@@ -1,5 +1,5 @@
 """
-Assemble the final expert-annotated test set from normalisedv2.
+Assemble the final expert-annotated test set from pre_adjudication.
 
 For each annotator, keep:
   · every charter UNIQUE to that annotator (i.e. not among the 10 shared);
@@ -9,7 +9,7 @@ All other annotators' copies of a shared charter are discarded for the
 test set, so each SDHK ID appears in exactly one output file.
 
 Output layout:
-    expert_annot/test_set/
+    data/expert_annotations/test_set/
         annotator_1_test.txt
         annotator_5_test.txt
         annotator_6_test.txt
@@ -17,7 +17,7 @@ Output layout:
         manifest.txt
 
 The per-annotator files are byte-for-byte passthroughs of the chosen
-charters from normalisedv2, including headers (SDHK <id>, annot. N /
+charters from pre_adjudication, including headers (SDHK <id>, annot. N /
 annoterare N) and --- SIDBRYTNING --- separators. The manifest lists
 every charter in the test set with its source annotator.
 """
@@ -27,7 +27,7 @@ import re
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SRC_DIR  = os.path.join(PROJECT_ROOT, "data", "expert_annotations", "normalised")
+SRC_DIR  = os.path.join(PROJECT_ROOT, "data", "expert_annotations", "pre_adjudication")
 DST_DIR  = os.path.join(PROJECT_ROOT, "data", "expert_annotations", "test_set")
 
 FILES = {
@@ -123,7 +123,9 @@ def main():
     lines.append("EXPERT-ANNOTATED TEST SET — MANIFEST")
     lines.append("=" * 72)
     lines.append("")
-    lines.append("Source: expert_annot/normalisedv2/ (normalised + verified)")
+    lines.append("Source: data/expert_annotations/pre_adjudication/ "
+                 "(annotator submissions, normalised + verified, "
+                 "before adjudication)")
     lines.append("Assembly rule:")
     lines.append("  · Unique charters go to their sole annotator's file.")
     lines.append("  · Shared charters go to the adjudicated annotator's file.")

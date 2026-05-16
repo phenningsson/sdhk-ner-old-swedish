@@ -1,11 +1,10 @@
 """
-Initial inter-annotator agreement on the 10 shared charters.
+Inter-annotator agreement on the 10 shared charters.
 
-Two metrics, matching the thesis description:
+Two metrics:
   1. Token-level Krippendorff's α (nominal) across all 4 coders. Labels are
-     IO (O / Person / Location), which captures type agreement — the thesis
-     notes that α does not measure boundary disagreements, so the finer
-     boundary question is handled by (2).
+     IO (O / Person / Location), which captures type agreement. α does not
+     measure boundary disagreements; that question is handled by (2).
   2. Pairwise entity-level F1 over all 6 coder pairs. An entity is a
      (charter, token-span, type) triple; a match requires EXACT span + type.
 
@@ -24,7 +23,7 @@ sys.path.insert(0, PROJECT_ROOT)
 
 from src.preprocessing.clean_text import tokenize_edition
 
-DIR = os.path.join(PROJECT_ROOT, "data", "expert_annotations", "normalised")
+DIR = os.path.join(PROJECT_ROOT, "data", "expert_annotations", "pre_adjudication")
    
 FILES = {
     "A1": "annotator_1_annotations.txt",
@@ -111,8 +110,8 @@ def clean_parallel(text, labels):
 
 def tokens_with_labels(cleaned, char_labels):
     """Tokenise with the project's tokeniser; assign each token the label
-    of its first character (tokens never straddle a label boundary because
-    we've verified no mid-word tags exist)."""
+    of its first character. Tokens never straddle a label boundary
+    because the source contains no mid-word tags."""
     out = []
     for t in tokenize_edition(cleaned):
         lab = char_labels[t["start"]] if t["start"] < len(char_labels) else "O"

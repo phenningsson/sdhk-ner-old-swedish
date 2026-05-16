@@ -4,7 +4,7 @@ Evaluate the three-signal entity projection pipeline on a directory of
 BIO-labelled CoNLL test files, using the same metrics protocol as
 scripts/evaluate_ner_v2.py (entity-level seqeval + token-level sklearn
 + FP/FN error diagnostic) so pipeline and NER numbers are directly
-comparable in the thesis.
+comparable.
 
 Supports two test sets, selected via --edition-source:
 
@@ -76,7 +76,7 @@ from scripts.compute_iaa import (
 )
 
 
-DIR = os.path.join(PROJECT_ROOT, "data", "expert_annotations", "normalised")
+DIR = os.path.join(PROJECT_ROOT, "data", "expert_annotations", "pre_adjudication")
 
 DEFAULT_TEST_DIR = os.path.join(
     PROJECT_ROOT, "data", "expert_gold_test"

@@ -42,22 +42,20 @@ from transformers import (
 )
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SCRIPTS_DIR  = os.path.join(PROJECT_ROOT, "scripts")
+SCRIPTS_DIR = os.path.join(PROJECT_ROOT, "scripts")
 sys.path.insert(0, PROJECT_ROOT)
 sys.path.insert(0, SCRIPTS_DIR)
 
-import config
-from src.training.data_utils import merge_files
-from src.evaluation.report import compute_and_report
 # Import chunker directly from the training script so train and eval
 # cannot drift apart — identical function, identical behaviour.
 from train_ner_v2 import chunk_at_o_boundaries
 
+import config
+from src.evaluation.report import compute_and_report
+from src.training.data_utils import merge_files
 
 DEFAULT_MODEL_ID = "phenningsson/sdhk-ner-old-swedish-v2"
-DEFAULT_TEST_DIR = os.path.join(
-    PROJECT_ROOT, "expert_annot", "final_test_set_conll"
-)
+DEFAULT_TEST_DIR = os.path.join(PROJECT_ROOT, "data", "expert_gold_test")
 DEFAULT_MAX_LENGTH = 512  # matches ner_results.json: chunking.max_length
 
 
@@ -131,23 +129,33 @@ def resolve_hf_token(cli_token):
 def main():
     parser = argparse.ArgumentParser(
         description="Evaluate the HF-hosted Old Swedish NER model on a "
-                    "CoNLL test directory, using the EXACT protocol of "
-                    "train_ner_v2.py (CPU-only)."
+        "CoNLL test directory, using the EXACT protocol of "
+        "train_ner_v2.py (CPU-only)."
     )
-    parser.add_argument("--model",     default=DEFAULT_MODEL_ID)
-    parser.add_argument("--test-dir",  default=DEFAULT_TEST_DIR)
-    parser.add_argument("--hf-token",  default=None,
-                        help="HF token for private repos. Falls back to "
-                             "$HF_TOKEN / $HUGGING_FACE_HUB_TOKEN.")
-    parser.add_argument("--max-length", type=int, default=DEFAULT_MAX_LENGTH,
-                        help="Subword budget per chunk; must match training "
-                             f"(default {DEFAULT_MAX_LENGTH}).")
+    parser.add_argument("--model", default=DEFAULT_MODEL_ID)
+    parser.add_argument("--test-dir", default=DEFAULT_TEST_DIR)
+    parser.add_argument(
+        "--hf-token",
+        default=None,
+        help="HF token for private repos. Falls back to "
+        "$HF_TOKEN / $HUGGING_FACE_HUB_TOKEN.",
+    )
+    parser.add_argument(
+        "--max-length",
+        type=int,
+        default=DEFAULT_MAX_LENGTH,
+        help="Subword budget per chunk; must match training "
+        f"(default {DEFAULT_MAX_LENGTH}).",
+    )
     parser.add_argument("--batch-size", type=int, default=8)
-    parser.add_argument("--output-json", default=None,
-                        help="Path to write the JSON results. Defaults to "
-                             "eval_results_<safe-model-id>.json in the project "
-                             "root — set this explicitly to keep expert-gold and "
-                             "internal-test-set runs from overwriting each other.")
+    parser.add_argument(
+        "--output-json",
+        default=None,
+        help="Path to write the JSON results. Defaults to "
+        "eval_results_<safe-model-id>.json in the project "
+        "root — set this explicitly to keep expert-gold and "
+        "internal-test-set runs from overwriting each other.",
+    )
     args = parser.parse_args()
 
     # ── Force CPU ──
@@ -168,10 +176,12 @@ def main():
     print(f"  Batch size: {args.batch_size}")
     print(f"  HF token:   {'set' if hf_token else 'not set (public only)'}")
 
-    # Version fingerprint — cite these in the thesis alongside results.
+    # Version fingerprint
     import platform
+    from importlib.metadata import PackageNotFoundError
+    from importlib.metadata import version as _pkg_version
+
     import transformers as _tf
-    from importlib.metadata import version as _pkg_version, PackageNotFoundError
 
     def _v(pkg):
         try:
@@ -195,19 +205,16 @@ def main():
     # mlm-adapted variants. Passing it is safe even if already set in the
     # saved tokenizer_config.json (same value → no-op).
     tokenizer_kwargs = {"add_prefix_space": True}
-    model_kwargs     = {}
+    model_kwargs = {}
     if hf_token:
         tokenizer_kwargs["token"] = hf_token
-        model_kwargs["token"]     = hf_token
+        model_kwargs["token"] = hf_token
 
     tokenizer = AutoTokenizer.from_pretrained(args.model, **tokenizer_kwargs)
-    model     = AutoModelForTokenClassification.from_pretrained(
-        args.model, **model_kwargs
-    )
+    model = AutoModelForTokenClassification.from_pretrained(args.model, **model_kwargs)
 
     if getattr(model.config, "id2label", None):
-        hub_labels = [model.config.id2label[i]
-                      for i in sorted(model.config.id2label)]
+        hub_labels = [model.config.id2label[i] for i in sorted(model.config.id2label)]
         if hub_labels != label_list:
             print("  ⚠ model id2label differs from config.LABEL_LIST:")
             print(f"    model : {hub_labels}")
@@ -229,7 +236,7 @@ def main():
     print(f"  Files:      {len(all_files)}")
     tokens, labels = merge_files(all_files)
     pre_sent = len(tokens)
-    pre_ent  = sum(1 for s in labels for l in s if l.startswith("B-"))
+    pre_ent = sum(1 for s in labels for l in s if l.startswith("B-"))
 
     # ── O-boundary chunking (SAME function as training) ──
     tokens, labels, chunk_stats = chunk_at_o_boundaries(
@@ -239,23 +246,27 @@ def main():
     dataset = NERDataset(tokens, labels, tokenizer, label2id, args.max_length)
 
     post_ent = sum(1 for s in labels for l in s if l.startswith("B-"))
-    total_tokens  = sum(len(s) for s in tokens)
+    total_tokens = sum(len(s) for s in tokens)
     entity_tokens = sum(1 for s in labels for l in s if l != "O")
 
     print(f"\n  Chunking (max_length={args.max_length}, O-boundary):")
     print(f"    Input sentences:   {pre_sent}")
     print(f"    Kept as-is:        {chunk_stats['kept_as_is']}")
-    print(f"    Chunked:           {chunk_stats['chunked']}  "
-          f"→ {chunk_stats['chunks_produced']} chunks")
-    print(f"    Unchunkable:       {chunk_stats['unchunkable']}  "
-          f"(0 = zero truncation of entity spans)")
+    print(
+        f"    Chunked:           {chunk_stats['chunked']}  "
+        f"→ {chunk_stats['chunks_produced']} chunks"
+    )
+    print(
+        f"    Unchunkable:       {chunk_stats['unchunkable']}  "
+        f"(0 = zero truncation of entity spans)"
+    )
     print(f"    Final sequences:   {len(tokens)}")
     print()
     print(f"  Tokens:         {total_tokens}")
-    print(f"  Entity tokens:  {entity_tokens} "
-          f"({100 * entity_tokens / total_tokens:.1f}%)")
-    print(f"  Gold entities:  {post_ent}  "
-          f"(pre-chunk: {pre_ent} — should be equal)")
+    print(
+        f"  Entity tokens:  {entity_tokens} ({100 * entity_tokens / total_tokens:.1f}%)"
+    )
+    print(f"  Gold entities:  {post_ent}  (pre-chunk: {pre_ent} — should be equal)")
     if post_ent != pre_ent:
         print(f"    ⚠ entity count changed during chunking — investigate.")
     print()
@@ -295,35 +306,36 @@ def main():
     # evaluate_pipeline.py via src/evaluation/report.py so the two
     # eval scripts cannot drift apart.
     import re as _re
+
     safe_model = _re.sub(r"[^A-Za-z0-9._-]", "_", args.model)
     out_path = args.output_json or os.path.join(
         PROJECT_ROOT, f"eval_results_{safe_model}.json"
     )
 
     extra_fields = {
-        "model":       args.model,
-        "test_dir":    args.test_dir,
-        "num_files":   len(all_files),
-        "max_length":  args.max_length,
-        "batch_size":  args.batch_size,
-        "device":      "cpu",
-        "protocol":    "train_ner_v2 (O-boundary chunking, add_prefix_space=True)",
+        "model": args.model,
+        "test_dir": args.test_dir,
+        "num_files": len(all_files),
+        "max_length": args.max_length,
+        "batch_size": args.batch_size,
+        "device": "cpu",
+        "protocol": "train_ner_v2 (O-boundary chunking, add_prefix_space=True)",
         "versions": {
-            "python":       platform.python_version(),
-            "torch":        torch.__version__,
+            "python": platform.python_version(),
+            "torch": torch.__version__,
             "transformers": _tf.__version__,
-            "seqeval":      seqeval_ver,
-            "numpy":        np.__version__,
-            "platform":     platform.platform(),
+            "seqeval": seqeval_ver,
+            "numpy": np.__version__,
+            "platform": platform.platform(),
         },
         "data": {
-            "input_sentences":   pre_sent,
-            "chunks_produced":   len(tokens),
+            "input_sentences": pre_sent,
+            "chunks_produced": len(tokens),
             "chunked_sentences": chunk_stats["chunked"],
-            "unchunkable":       chunk_stats["unchunkable"],
-            "total_tokens":      total_tokens,
-            "entity_tokens":     entity_tokens,
-            "gold_entities":     post_ent,
+            "unchunkable": chunk_stats["unchunkable"],
+            "total_tokens": total_tokens,
+            "entity_tokens": entity_tokens,
+            "gold_entities": post_ent,
         },
     }
     compute_and_report(

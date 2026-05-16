@@ -5,10 +5,13 @@ Extract Old Swedish edition texts from the full SDHK CSV for MLM pre-training.
 Applies the same text cleaning as the scraper's clean_transcription() to ensure
 consistency between the scraped JSON editions and the CSV editions.
 
+The SDHK CSV is not bundled with the repository. Download it from:
+    https://filer.riksarkivet.se/registerdata/SDHK/csv/sdhk_2411.csv
+
 Usage:
-    .venv/bin/python3 scripts/extract_mlm_corpus.py
+    .venv/bin/python3 scripts/extract_mlm_corpus.py --csv sdhk_2411.csv
     .venv/bin/python3 scripts/extract_mlm_corpus.py --csv sdhk_2411.csv --output data/raw/sdhk_all_swedish.json
-    .venv/bin/python3 scripts/extract_mlm_corpus.py --min-words 20 --latin-threshold 0.5
+    .venv/bin/python3 scripts/extract_mlm_corpus.py --csv sdhk_2411.csv --min-words 20 --latin-threshold 0.5
 """
 
 import argparse
@@ -93,8 +96,9 @@ def main():
     )
     parser.add_argument(
         "--csv",
-        default=os.path.join(PROJECT_ROOT, "sdhk_2411.csv"),
-        help="Path to SDHK CSV file",
+        required=True,
+        help="Path to SDHK CSV file. Download from "
+             "https://filer.riksarkivet.se/registerdata/SDHK/csv/sdhk_2411.csv",
     )
     parser.add_argument(
         "--output",

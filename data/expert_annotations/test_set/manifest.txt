@@ -1,7 +1,7 @@
 EXPERT-ANNOTATED TEST SET — MANIFEST
 ========================================================================
 
-Source: data/expert_annotations/normalised
+Source: data/expert_annotations/pre_adjudication/ (annotator submissions, before adjudication)
 Assembly rule:
   · Unique charters go to their sole annotator's file.
   · Shared charters go to the adjudicated annotator's file.

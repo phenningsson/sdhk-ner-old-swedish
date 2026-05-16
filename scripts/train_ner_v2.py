@@ -9,10 +9,15 @@ Changes from train_ner.py:
     training. No information is lost.
 
 Supports four model variants:
-  ner-swe      KBLab/bert-base-swedish-cased-ner  (NER-tuned Swedish BERT)
-  bert-swe     KBLab/bert-base-swedish-cased      (base Swedish BERT)
-  mlm-adapted  models/mlm_pretrained_v3             (domain-adapted via MLM)
-  xlm-roberta  xlm-roberta-base                   (multilingual)
+  ner-swe      KBLab/bert-base-swedish-cased-ner    (NER-tuned Swedish BERT)
+  bert-swe     KBLab/bert-base-swedish-cased        (base Swedish BERT)
+  mlm-adapted  phenningsson/sdhk-mlm-pretrained     (published MLM-adapted
+                                                     base — to fine-tune on
+                                                     a locally produced
+                                                     checkpoint instead, see
+                                                     the mlm-adapted entry in
+                                                     config.NER_MODEL_VARIANTS)
+  xlm-roberta  xlm-roberta-base                     (multilingual)
 
 Features:
   - O-boundary chunking: zero-truncation guarantee for all entity spans
@@ -65,7 +70,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import config
 from src.training.data_utils import merge_files, read_conll_file, split_files
-
 
 # ================================================================
 # O-boundary chunking (NEW in v2)
@@ -123,9 +127,7 @@ def chunk_at_o_boundaries(tokens_list, labels_list, tokenizer, max_length=256):
 
         # --- Need to chunk ---
         stats["chunked"] += 1
-        chunks = _split_sentence_at_o(
-            sent_toks, sent_labs, word_subword_counts, budget
-        )
+        chunks = _split_sentence_at_o(sent_toks, sent_labs, word_subword_counts, budget)
 
         if len(chunks) == 1 and sum(word_subword_counts) > budget:
             # Could not split (no O boundaries) — will still be truncated
@@ -731,15 +733,21 @@ def main():
     )
 
     print(f"\n  After chunking (max_length={args.max_length}):")
-    print(f"    Train: {len(train_tokens)} chunks "
-          f"({train_stats['chunked']} sentences split, "
-          f"{train_stats['unchunkable']} unchunkable)")
-    print(f"    Val:   {len(val_tokens)} chunks "
-          f"({val_stats['chunked']} sentences split, "
-          f"{val_stats['unchunkable']} unchunkable)")
-    print(f"    Test:  {len(test_tokens)} chunks "
-          f"({test_stats['chunked']} sentences split, "
-          f"{test_stats['unchunkable']} unchunkable)")
+    print(
+        f"    Train: {len(train_tokens)} chunks "
+        f"({train_stats['chunked']} sentences split, "
+        f"{train_stats['unchunkable']} unchunkable)"
+    )
+    print(
+        f"    Val:   {len(val_tokens)} chunks "
+        f"({val_stats['chunked']} sentences split, "
+        f"{val_stats['unchunkable']} unchunkable)"
+    )
+    print(
+        f"    Test:  {len(test_tokens)} chunks "
+        f"({test_stats['chunked']} sentences split, "
+        f"{test_stats['unchunkable']} unchunkable)"
+    )
 
     # Class distribution
     flat_train = [l for sent in train_labels for l in sent]

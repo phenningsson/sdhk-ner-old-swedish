@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """
-Scrape SDHK charters (1380-1382) with CAPTCHA cookie.
+Scrape SDHK charters with a CAPTCHA cookie.
 
 Usage:
-    .venv/bin/python3 scrape_all_charters.py --cookie "altcha_verified=..."
+    .venv/bin/python3 src/scraping/scrape_sdhk.py \\
+        --cookie "altcha_verified=..." \\
+        --ids-file path/to/charter_ids.json \\
+        --output data/raw/scraped.json
 
+The --ids-file must be a JSON list of charter IDs (strings or ints).
 Resumes automatically if interrupted — skips already-scraped IDs.
 """
 
@@ -149,7 +153,7 @@ def scrape_charter(charter_id, cookie):
 
     req = urllib.request.Request(url)
     req.add_header('Cookie', cookie)
-    req.add_header('User-Agent', 'Mozilla/5.0 (research/thesis)')
+    req.add_header('User-Agent', 'Mozilla/5.0 (academic research)')
 
     try:
         resp = urllib.request.urlopen(req, timeout=30)
@@ -182,29 +186,15 @@ def scrape_charter(charter_id, cookie):
 def main():
     parser = argparse.ArgumentParser(description='Scrape SDHK charters')
     parser.add_argument('--cookie', required=True, help='altcha_verified cookie value')
-    parser.add_argument('--output', default='sdhk_1380_1382_scraped.json', help='Output JSON file')
+    parser.add_argument('--ids-file', required=True,
+                        help='JSON file containing a list of charter IDs to scrape')
+    parser.add_argument('--output', default='sdhk_scraped.json', help='Output JSON file')
     parser.add_argument('--delay', type=float, default=1.5, help='Delay between requests (seconds)')
-    parser.add_argument('--ids-file', help='JSON file with list of charter IDs (overrides default)')
-    parser.add_argument('--year-from', type=int, default=1380, help='Start year (inclusive)')
-    parser.add_argument('--year-to', type=int, default=1382, help='End year (inclusive)')
     args = parser.parse_args()
 
-    if args.ids_file:
-        # Load IDs from explicit file
-        with open(args.ids_file, 'r', encoding='utf-8') as f:
-            charter_ids = [str(cid) for cid in json.load(f)]
-        print(f"Loaded {len(charter_ids)} charter IDs from {args.ids_file}")
-    else:
-        # Load charter IDs from existing JSON, filtered by year range
-        with open('sdhk_swedish_1380_1399.json', 'r', encoding='utf-8') as f:
-            existing = json.load(f)
-
-        charter_ids = []
-        for d in existing:
-            date_str = str(d.get('Date', ''))
-            year = date_str[:4] if len(date_str) >= 4 else ''
-            if year.isdigit() and args.year_from <= int(year) <= args.year_to:
-                charter_ids.append(str(d['Id']))
+    with open(args.ids_file, 'r', encoding='utf-8') as f:
+        charter_ids = [str(cid) for cid in json.load(f)]
+    print(f"Loaded {len(charter_ids)} charter IDs from {args.ids_file}")
 
     print(f"Total charters to scrape: {len(charter_ids)}")
 

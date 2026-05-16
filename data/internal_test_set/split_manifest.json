@@ -1,7 +1,7 @@
 {
   "seed": 42,
-  "source_dir": "data/1380_1382_dataset`",
-  "output_dir": "data/internal_test_set`",
+  "source_dir": "data/1380_1382_dataset",
+  "output_dir": "data/internal_test_set",
   "train": [
     "sdhk_12002_silver.conll",
     "sdhk_12126_silver.conll",
