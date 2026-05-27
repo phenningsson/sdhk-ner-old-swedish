@@ -12,7 +12,8 @@ Tokenisation mirrors src.preprocessing.clean_text so that the IAA token
 scheme lines up with the later CoNLL 2002 BIO conversion.
 
 v2: α is now computed via NLTK's AnnotationTask (Artstein & Poesio 2008
-test cases) rather than a hand-rolled coincidence-matrix implementation.
+test cases) rather than the custom implementation in compute_iaa.py.
+This script is to be used for the IAA calculation.
 """
 
 import os
