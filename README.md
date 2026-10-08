@@ -180,7 +180,7 @@ of `evaluate_ner_v2.py`. Some scripts need GPUs (or a lot of patience if running
 
 ## Resources
 
-- **Paper:** *(coming soon)*
+- **Thesis:** [https://urn.kb.se/resolve?urn=urn:nbn:se:lnu:diva-148739](https://urn.kb.se/resolve?urn=urn:nbn:se:lnu:diva-148739)
 - **Models:** [HuggingFace Hub — phenningsson](https://huggingface.co/phenningsson)
   - Fine-tuned NER: `phenningsson/sdhk-ner-old-swedish-v2`
   - MLM-adapted base: `phenningsson/sdhk-mlm-pretrained-full`
@@ -192,7 +192,17 @@ of `evaluate_ner_v2.py`. Some scripts need GPUs (or a lot of patience if running
 If you want to reference this work in any way, please cite:
 
 ```bibtex
-@key{comingsoon}
+@mastersthesis{Henningsson2086552,
+   author = {Henningsson, Pontus},
+   institution = {Linnaeus University, Department of Cultural Sciences},
+   pages = {84},
+   school = {Linnaeus University, Department of Cultural Sciences},
+   title = {Old Swedish Entities: Developing Named Entity Recognition for Medieval Charters Written in Old Swedish},
+   keywords = {named entity recognition, Old Swedish, natural language processing, medieval Scandinavian, digital humanities},
+   abstract = {The Old Swedish charters stored in the Swedish National Archives' Svenskt Diplomatariums huvudkartotek (SDHK) represent some of the most important source collections for studies of medieval Sweden, yet no dedicated open source Named Entity Recognition (NER) model exists for Old Swedish. This thesis evaluates whether such a model can be developed using SDHK charters through entity projection and NER training. An entity projection pipeline is created to automatically annotate entities in Old Swedish charters from 1380-1382. The automated annotations are subsequently manually verified, resulting in an entity-annotated corpus of 417 charters used to train the NER model. Both the pipeline and model are evaluated using F1 scores on a test set of 75 charters from 1375-1382 annotated by domain experts. Inter-annotator agreement is calculated using Krippendorff's alpha and pairwise F1 to evaluate the reliability of the expert annotations and thereby validate the test set. The pipeline and NER model achieve F1 scores of 0.6987 and 0.9764 respectively, and the inter-annotator agreement reaches a Krippendorff's alpha of 0.9812 and pairwise F1 of 0.967, which indicates very high annotator agreement. Beyond these results, the thesis discusses the nature of annotation and mediation of Old Swedish entities, where the developed resources of the thesis are best understood as the result of a chain of mediation and interpretation of the Old Swedish charter texts. This thesis contributes an openly available NER model, entity projection pipeline, and entity-annotated corpus for Old Swedish, while demonstrating how entity annotation and extraction are tinged with interpretative decisions that ultimately reflect what, and how, Old Swedish entities can be represented. },
+   year = {2026},
+   url  = {https://urn.kb.se/resolve?urn=urn:nbn:se:lnu:diva-148739}
+}
 ```
 
 ## License
